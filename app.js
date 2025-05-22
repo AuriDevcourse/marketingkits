@@ -15,7 +15,7 @@ const imageCache = {
   isLoaded: false
 };
 
-const FONT_FAMILY = 'Archivo Expanded';
+const FONT_FAMILY = '"Archivo Expanded", Archivo, Arial, sans-serif';
 const FONT_SIZE = 60;
 const FONT_WEIGHT = 600;
 const TEXT_X = 80;
@@ -121,8 +121,10 @@ function drawOverlay(overlayType = currentOverlay) {
     const jobTitleY = TEXT_Y + (linesUsed * lineHeight) + 20; // Add some spacing
     
     // Draw the job title/company with text wrapping
-    overlayCtx.font = `300 50px '${FONT_FAMILY}'`;
+    overlayCtx.font = `300 50px ${FONT_FAMILY}`;
     overlayCtx.fillStyle = '#f2f2f2';
+    // Force the canvas to recognize the font
+    overlayCtx.font = `300 50px ${FONT_FAMILY}`;
     
     // Draw the wrapped job title/company
     const jobLineHeight = 50 * 1.2; // 50 is the font size for job title
@@ -351,17 +353,19 @@ function drawTextOnOverlay() {
   // Draw the name if it exists
   if (customText) {
     overlayCtx.save();
-    overlayCtx.font = `${FONT_WEIGHT} ${FONT_SIZE}px '${FONT_FAMILY}'`;
+    overlayCtx.font = `600 ${FONT_SIZE}px ${FONT_FAMILY}`;
     overlayCtx.fillStyle = '#f2f2f2';
     overlayCtx.textBaseline = 'top';
-    
-    // Draw the wrapped name
-    const nameLines = wrapText(overlayCtx, customText, TEXT_X, TEXT_Y, CANVAS_WIDTH - TEXT_X - 90, lineHeight);
+    // Force the canvas to recognize the font
+    overlayCtx.font = `600 ${FONT_SIZE}px ${FONT_FAMILY}`;
+    const linesUsed = wrapText(overlayCtx, customText, TEXT_X, TEXT_Y, CANVAS_WIDTH - TEXT_X - 90, lineHeight);
     
     // Draw the job title with text wrapping if it exists
     if (secondText) {
-      const jobTitleY = TEXT_Y + (nameLines * lineHeight) + 20;
-      overlayCtx.font = `300 50px '${FONT_FAMILY}'`;
+      const jobTitleY = TEXT_Y + (linesUsed * lineHeight) + 20;
+      overlayCtx.font = `300 50px ${FONT_FAMILY}`;
+      // Force the canvas to recognize the font
+      overlayCtx.font = `300 50px ${FONT_FAMILY}`;
       wrapText(overlayCtx, secondText, TEXT_X, jobTitleY, CANVAS_WIDTH - TEXT_X - 90, jobLineHeight);
     }
     
@@ -370,9 +374,11 @@ function drawTextOnOverlay() {
   // If no name but there is a second text, still draw the second text
   else if (secondText) {
     overlayCtx.save();
-    overlayCtx.font = `300 50px '${FONT_FAMILY}'`;
+    overlayCtx.font = `300 50px ${FONT_FAMILY}`;
     overlayCtx.fillStyle = '#f2f2f2';
     overlayCtx.textBaseline = 'top';
+    // Force the canvas to recognize the font
+    overlayCtx.font = `300 50px ${FONT_FAMILY}`;
     wrapText(overlayCtx, secondText, TEXT_X, TEXT_Y, CANVAS_WIDTH - TEXT_X - 90, jobLineHeight);
     overlayCtx.restore();
   }
@@ -416,13 +422,43 @@ document.querySelectorAll('.toggle-btn').forEach(btn => {
   });
 });
 
+// Function to ensure fonts are loaded
+function ensureFontsLoaded() {
+  return new Promise((resolve) => {
+    // This will force the browser to load the font
+    const testText = 'Font Load Test';
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set initial font to something that exists
+    ctx.font = '16px Arial';
+    const initialWidth = ctx.measureText(testText).width;
+    
+    // Set to our font
+    ctx.font = `600 ${FONT_SIZE}px ${FONT_FAMILY}`;
+    
+    // Check if the font is already loaded
+    if (ctx.measureText(testText).width !== initialWidth) {
+      return resolve();
+    }
+    
+    // If not, wait for it
+    document.fonts.ready.then(() => {
+      resolve();
+    });
+  });
+}
+
 // Handle download
-function downloadCanvas() {
+async function downloadCanvas() {
+  // Wait for fonts to be fully loaded
+  await ensureFontsLoaded();
+  
   // Create a temporary canvas for the final image
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = CANVAS_WIDTH;
   tempCanvas.height = CANVAS_HEIGHT;
-  const tempCtx = tempCanvas.getContext('2d');
+  const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
   
   // First draw the current canvas state (background and profile image)
   tempCtx.drawImage(canvas, 0, 0);
@@ -440,16 +476,23 @@ function downloadCanvas() {
     const jobLineHeight = 50 * 1.2; // 50 is the font size for job title
     
     // Draw the name with text wrapping
-    tempCtx.font = `${FONT_WEIGHT} ${FONT_SIZE}px '${FONT_FAMILY}'`;
+    const nameFont = `600 ${FONT_SIZE}px ${FONT_FAMILY}`;
+    tempCtx.font = nameFont;
     tempCtx.fillStyle = '#f2f2f2';
     tempCtx.textBaseline = 'top';
+    
+    // Force canvas to recognize the font by measuring text first
+    tempCtx.measureText('test');
     
     // Draw the wrapped name
     const nameLines = wrapTextDownload(tempCtx, customText, TEXT_X, TEXT_Y, CANVAS_WIDTH - TEXT_X - 90, lineHeight);
     
     // Draw the job title with text wrapping
     const jobTitleY = TEXT_Y + (nameLines * lineHeight) + 20;
-    tempCtx.font = `300 50px '${FONT_FAMILY}'`;
+    const jobFont = `300 50px ${FONT_FAMILY}`;
+    tempCtx.font = jobFont;
+    // Force canvas to recognize the font by measuring text first
+    tempCtx.measureText('test');
     wrapTextDownload(tempCtx, secondText, TEXT_X, jobTitleY, CANVAS_WIDTH - TEXT_X - 90, jobLineHeight);
     
     // Create download link
@@ -476,7 +519,7 @@ function downloadCanvas() {
 }
 
 // Initialize the application
-// Load all required images
+// Load all required images and fonts
 function loadImages() {
   return new Promise((resolve) => {
     let loadedCount = 0;
@@ -485,8 +528,11 @@ function loadImages() {
     const onImageLoad = () => {
       loadedCount++;
       if (loadedCount === totalImages) {
-        imageCache.isLoaded = true;
-        resolve();
+        // Wait for fonts to be loaded before resolving
+        ensureFontsLoaded().then(() => {
+          imageCache.isLoaded = true;
+          resolve();
+        });
       }
     };
     
