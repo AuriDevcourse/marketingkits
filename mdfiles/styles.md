@@ -1,0 +1,11 @@
+- **Font**: Archivo Expanded (headlines)
+- **Text Color**: White
+- **Headline Size**: 40px (e.g., “I’M ATTENDING”)
+- **Name**: 24px bold
+- **Job Title/Company**: 18px regular
+- **Text Alignment**: Left-aligned
+- **Profile Image Area**:
+  - Bottom right
+  - Behind PNG cutout with gradient frame (provided as transparent PNG)
+- **Background**: Full canvas (bg1–bg6)
+- **Layout**: 1080x1080px, absolute positioning for key elements

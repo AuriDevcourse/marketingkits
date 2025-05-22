@@ -1,0 +1,14 @@
+- **Image Upload** (square image only, validated)
+  - Drag and drop positioning
+  - Scale controls
+  - Position sliders (horizontal and vertical)
+- **Text Inputs**
+  - Name
+  - Job Title
+  - Company
+- **Background Selector**
+  - Buttons or dropdown for bg1–bg6
+- **Live Preview Area**
+  - Displays composite of background + text + photo in cutout
+- **Download Button**
+  - Exports current preview as JPG

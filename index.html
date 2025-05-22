@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080, initial-scale=1.0">
+  <title>TechBBQ Image Generator</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h1>TechBBQ Image Generator</h1>
+    
+    <!-- Canvas Container -->
+    <div class="canvas-container">
+      <canvas id="main-canvas" width="1500" height="1500"></canvas>
+    </div>
+    
+    <!-- Text Controls -->
+    <div class="controls">
+      <label for="customText">Full Name:</label>
+      <input type="text" id="customText" placeholder="Enter your full name" />
+    </div>
+    <div class="controls">
+      <label for="secondText">Job title and company:</label>
+      <input type="text" id="secondText" placeholder="e.g. Product Manager at TechBBQ" />
+      <button id="updateText">Update Text</button>
+    </div>
+    
+    <!-- Image Upload -->
+    <div class="controls">
+      <label for="imageUpload" class="upload-btn">
+        <span>Upload Profile Image</span>
+        <input type="file" id="imageUpload" accept="image/*" />
+      </label>
+    </div>
+    
+    <!-- Overlay Type -->
+    <div class="controls">
+      <label>Overlay Type:</label>
+      <div class="toggle-buttons">
+        <button class="toggle-btn active" data-type="attending">Attending</button>
+        <button class="toggle-btn" data-type="speaking">Speaking</button>
+      </div>
+    </div>
+    
+    <!-- Image Controls -->
+    <div class="image-controls">
+      <div class="control-group">
+        <label>Scale: <span id="scaleValue">100%</span></label>
+        <input type="range" id="scaleControl" min="0.1" max="4.0" step="0.05" value="1.0">
+      </div>
+      
+      <div class="control-group">
+        <label>Position X: <span id="positionXValue">0</span></label>
+        <input type="range" id="positionX" min="-200" max="200" value="0">
+      </div>
+      
+      <div class="control-group">
+        <label>Position Y: <span id="positionYValue">0</span></label>
+        <input type="range" id="positionY" min="-200" max="200" value="0">
+      </div>
+    </div>
+    
+    <!-- Download Button -->
+    <button id="downloadBtn" class="download-btn">Download Image</button>
+  </div>
+  
+  <script src="app.js"></script>
+</body>
+</html>
