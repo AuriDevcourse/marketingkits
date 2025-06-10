@@ -15,61 +15,87 @@
 </head>
 <body>
   <div class="container">
-    <h1>TechBBQ Custom Visual</h1>
     
-    <!-- Canvas Container -->
-    <div class="canvas-container">
-      <canvas id="main-canvas" width="1500" height="1500"></canvas>
-    </div>
-    
-    <!-- Text Controls -->
-    <div class="controls">
-      <label for="customText">Full Name:</label>
-      <input type="text" id="customText" placeholder="Enter your full name" />
-    </div>
-    <div class="controls">
-      <label for="secondText">Job title and company:</label>
-      <input type="text" id="secondText" placeholder="e.g. Product Manager at TechBBQ" />
-      <button id="updateText">Update Text</button>
-    </div>
-    
-    <!-- Image Upload -->
-    <div class="controls">
-      <label for="imageUpload" class="upload-btn">
-        <span>Upload Profile Image</span>
-        <input type="file" id="imageUpload" accept="image/*" />
-      </label>
-    </div>
-    
-    <!-- Overlay Type -->
-    <div class="controls">
-      <label>Overlay Type:</label>
-      <div class="toggle-buttons">
-        <button class="toggle-btn active" data-type="attending">Attending</button>
-        <button class="toggle-btn" data-type="speaking">Speaking</button>
-      </div>
-    </div>
-    
-    <!-- Image Controls -->
-    <div class="image-controls">
-      <div class="control-group">
-        <label>Scale: <span id="scaleValue">100%</span></label>
-        <input type="range" id="scaleControl" min="0.1" max="4.0" step="0.05" value="1.0">
+    <div class="layout-container">
+      <!-- Canvas Container (Left) -->
+      <div class="canvas-section">
+        <div class="canvas-container">
+          <canvas id="main-canvas" width="1500" height="1500"></canvas>
+        </div>
       </div>
       
-      <div class="control-group">
-        <label>Position X: <span id="positionXValue">0</span></label>
-        <input type="range" id="positionX" min="-200" max="200" value="0">
-      </div>
-      
-      <div class="control-group">
-        <label>Position Y: <span id="positionYValue">0</span></label>
-        <input type="range" id="positionY" min="-200" max="200" value="0">
+      <!-- Controls Section (Right) -->
+      <div class="controls-section">
+        <!-- Text Controls -->
+        <div class="controls">
+          <label for="customText">Full Name:</label>
+          <input type="text" id="customText" placeholder="Enter your full name" />
+        </div>
+        <div class="controls">
+          <label for="secondText">Job title and company:</label>
+          <input type="text" id="secondText" placeholder="e.g. Product Manager at TechBBQ" />
+          <button id="updateText">Update Text</button>
+        </div>
+        
+        <!-- Image Upload -->
+        <div class="controls">
+          <label for="imageUpload" class="upload-btn">
+            <span>Upload Profile Image</span>
+            <input type="file" id="imageUpload" accept="image/*" />
+          </label>
+        </div>
+        
+        <!-- Overlay Type -->
+        <div class="controls">
+          <label>Overlay Type:</label>
+          <div class="toggle-buttons">
+            <button class="toggle-btn active" data-type="attending">Attending</button>
+            <button class="toggle-btn" data-type="speaking">Speaking</button>
+          </div>
+        </div>
+        
+        <!-- Image Controls -->
+        <div class="image-controls">
+          <div class="control-group">
+            <label>Scale: <span id="scaleValue">100%</span></label>
+            <div class="slider-with-buttons">
+              <button class="control-btn" id="scaleDown">-</button>
+              <input type="range" id="scaleControl" min="0.1" max="4.0" step="0.05" value="1.0">
+              <button class="control-btn" id="scaleUp">+</button>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <label>Horizontal Position: <span id="positionXValue">0</span></label>
+            <div class="slider-with-icons">
+              <span class="slider-icon">←</span>
+              <div class="slider-with-buttons">
+                <button class="control-btn" id="posXDown">-</button>
+                <input type="range" id="positionX" min="-100" max="100" value="0">
+                <button class="control-btn" id="posXUp">+</button>
+              </div>
+              <span class="slider-icon">→</span>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <label>Vertical Position: <span id="positionYValue">0</span></label>
+            <div class="slider-with-icons">
+              <span class="slider-icon">↑</span>
+              <div class="slider-with-buttons">
+                <button class="control-btn" id="posYDown">-</button>
+                <input type="range" id="positionY" min="-100" max="100" value="0">
+                <button class="control-btn" id="posYUp">+</button>
+              </div>
+              <span class="slider-icon">↓</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Download Button -->
+        <button id="downloadBtn" class="download-btn">Download Image</button>
       </div>
     </div>
-    
-    <!-- Download Button -->
-    <button id="downloadBtn" class="download-btn">Download Image</button>
   </div>
   
   <script src="app.js"></script>

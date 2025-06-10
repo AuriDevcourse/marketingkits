@@ -1,6 +1,5 @@
 const CANVAS_WIDTH = 1500;
 const CANVAS_HEIGHT = 1500;
-const BACKGROUND_IMAGE = './images/bg1.jpg'; // Background image
 let currentOverlay = 'attending'; // 'attending' or 'speaking'
 const OVERLAY_IMAGES = {
   attending: './images/attending.png',
@@ -56,18 +55,50 @@ function draw() {
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   bgCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   overlayCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-  // Draw background (solid color as fallback)
-  bgCtx.fillStyle = '#2c3e50';
-  bgCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   
-  // Draw background image if available
-  if (imageCache.background) {
-    bgCtx.drawImage(imageCache.background, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  // Draw the overlay image as the background
+  if (imageCache[currentOverlay]) {
+    bgCtx.drawImage(imageCache[currentOverlay], 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
   
-  // Draw profile image and overlay
-  drawProfileImage();
+  // First draw the background to the main canvas
+  ctx.drawImage(bgCanvas, 0, 0);
+  
+  // Then draw the profile image as a rectangle in the bottom right
+  if (profileImage) {
+    // Calculate position based on slider values - default to bottom right
+    const baseSize = Math.min(canvas.width, canvas.height) / 3;
+    const scale = parseFloat(document.getElementById('scaleControl').value || 1.0);
+    
+    // Position adjustment from sliders
+    const xOffset = parseInt(document.getElementById('positionX').value || 0);
+    const yOffset = parseInt(document.getElementById('positionY').value || 0);
+    
+    // Fixed center point in the bottom right
+    const centerX = canvas.width - baseSize/2 - 100 + xOffset; // 100px from right edge
+    const centerY = canvas.height - baseSize/2 - 100 + yOffset; // 100px from bottom edge
+    
+    // Calculate size with scale
+    const size = baseSize * scale;
+    
+    // Calculate top-left corner to maintain the center point
+    const x = centerX - size/2;
+    const y = centerY - size/2;
+    
+    // Draw the profile image as a rectangle (no clipping)
+    ctx.drawImage(profileImage, x, y, size, size);
+  }
+  
+  // Draw the overlay image again on top of the profile image
+  if (imageCache[currentOverlay]) {
+    ctx.drawImage(imageCache[currentOverlay], 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  }
+  
+  // Draw text on the overlay canvas
+  drawTextOnOverlay();
+  
+  // Draw the overlay canvas (with text) onto the main canvas
+  ctx.drawImage(overlayCanvas, 0, 0);
 }
 
 function drawProfileImage() {
@@ -77,66 +108,57 @@ function drawProfileImage() {
   drawTextOnOverlay();
 }
 
+// Function to redraw the main canvas with background and profile image
+function redrawMainCanvas() {
+  // Clear the main canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Draw the background canvas onto the main canvas
+  ctx.drawImage(bgCanvas, 0, 0);
+  
+  // Draw the profile image as a rectangle in the bottom right
+  if (profileImage) {
+    // Calculate position based on slider values - default to bottom right
+    const baseSize = Math.min(canvas.width, canvas.height) / 3;
+    const scale = parseFloat(document.getElementById('scaleControl').value || 1.0);
+    
+    // Position adjustment from sliders
+    const xOffset = parseInt(document.getElementById('positionX').value || 0);
+    const yOffset = parseInt(document.getElementById('positionY').value || 0);
+    
+    // Fixed center point in the bottom right
+    const centerX = canvas.width - baseSize/2 - 100 + xOffset; // 100px from right edge
+    const centerY = canvas.height - baseSize/2 - 100 + yOffset; // 100px from bottom edge
+    
+    // Calculate size with scale
+    const size = baseSize * scale;
+    
+    // Calculate top-left corner to maintain the center point
+    const x = centerX - size/2;
+    const y = centerY - size/2;
+    
+    // Draw the profile image as a rectangle (no clipping)
+    ctx.drawImage(profileImage, x, y, size, size);
+  }
+  
+  // Draw the overlay image again on top of the profile image
+  if (imageCache[currentOverlay]) {
+    ctx.drawImage(imageCache[currentOverlay], 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  }
+}
+
+// Draw overlay image
 function drawOverlay(overlayType = currentOverlay) {
-  // Draw the overlay image (transparent cutout)
-  const overlayImg = new Image();
-  overlayImg.onload = () => {
-    // Draw the overlay image (with transparency)
-    overlayCtx.drawImage(overlayImg, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    
-    // Draw the full name with text wrapping
-    overlayCtx.font = `${FONT_WEIGHT} ${FONT_SIZE}px '${FONT_FAMILY}'`;
-    overlayCtx.fillStyle = '#f2f2f2';
-    overlayCtx.textBaseline = 'top';
-    
-    // Text wrapping function
-    const wrapText = (text, x, y, maxWidth, lineHeight) => {
-      const words = text.split(' ');
-      let line = '';
-      let lineCount = 0;
-      const rightEdge = CANVAS_WIDTH - 90; // 90px from right edge
-      
-      for (let i = 0; i < words.length; i++) {
-        const testLine = line + words[i] + ' ';
-        const metrics = overlayCtx.measureText(testLine);
-        const testWidth = metrics.width;
-        
-        if (testWidth > maxWidth && i > 0) {
-          overlayCtx.fillText(line, x, y + (lineCount * lineHeight));
-          line = words[i] + ' ';
-          lineCount++;
-        } else {
-          line = testLine;
-        }
-      }
-      overlayCtx.fillText(line, x, y + (lineCount * lineHeight));
-      return lineCount + 1; // Return number of lines used
-    };
-    
-    // Draw the wrapped name
-    const lineHeight = FONT_SIZE * 1.2; // 1.2 is the line height multiplier
-    const linesUsed = wrapText(customText, TEXT_X, TEXT_Y, CANVAS_WIDTH - TEXT_X - 90, lineHeight);
-    
-    // Adjust Y position for the job title based on number of lines used
-    const jobTitleY = TEXT_Y + (linesUsed * lineHeight) + 20; // Add some spacing
-    
-    // Draw the job title/company with text wrapping
-    overlayCtx.font = `300 50px ${FONT_FAMILY}`;
-    overlayCtx.fillStyle = '#f2f2f2';
-    // Force the canvas to recognize the font
-    overlayCtx.font = `300 50px ${FONT_FAMILY}`;
-    
-    // Draw the wrapped job title/company
-    const jobLineHeight = 50 * 1.2; // 50 is the font size for job title
-    const jobLinesUsed = wrapText(secondText, TEXT_X, jobTitleY, CANVAS_WIDTH - TEXT_X - 90, jobLineHeight);
-    
-    // Calculate the total height used by both name and job title
-    const totalHeightUsed = (linesUsed * lineHeight) + (jobLinesUsed * jobLineHeight) + 40; // 40px for spacing
-    
-    // Draw the overlay onto the main canvas
-    ctx.drawImage(overlayCanvas, 0, 0);
-  };
-  overlayImg.src = OVERLAY_IMAGE;
+  if (!overlayType || !OVERLAY_IMAGES[overlayType] || !imageCache.isLoaded) return;
+  
+  // Clear the overlay canvas - we'll only use this for text
+  overlayCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  
+  // Draw text on the overlay canvas
+  drawTextOnOverlay();
+  
+  // Update the main canvas with the overlay text
+  ctx.drawImage(overlayCanvas, 0, 0);
 }
 
 // Function to resize image while maintaining aspect ratio
@@ -234,12 +256,62 @@ document.getElementById('scaleControl').addEventListener('input', function(e) {
   redrawMainCanvas();
 });
 
+// Handle scale buttons (increment by 0.1)
+document.getElementById('scaleUp').addEventListener('click', function() {
+  const scaleControl = document.getElementById('scaleControl');
+  let value = parseFloat(scaleControl.value);
+  value = Math.min(value + 0.1, 4.0); // Don't exceed max
+  scaleControl.value = value;
+  profileScale = value;
+  document.getElementById('scaleValue').textContent = `${Math.round(value * 100)}%`;
+  drawProfileImage();
+  drawTextOnOverlay();
+  redrawMainCanvas();
+});
+
+document.getElementById('scaleDown').addEventListener('click', function() {
+  const scaleControl = document.getElementById('scaleControl');
+  let value = parseFloat(scaleControl.value);
+  value = Math.max(value - 0.1, 0.1); // Don't go below min
+  scaleControl.value = value;
+  profileScale = value;
+  document.getElementById('scaleValue').textContent = `${Math.round(value * 100)}%`;
+  drawProfileImage();
+  drawTextOnOverlay();
+  redrawMainCanvas();
+});
+
 // Handle position controls
 document.getElementById('positionX').addEventListener('input', function(e) {
   profileX = parseInt(e.target.value);
   document.getElementById('positionXValue').textContent = profileX;
   drawProfileImage();
   // Ensure text is redrawn
+  drawTextOnOverlay();
+  redrawMainCanvas();
+});
+
+// Handle horizontal position buttons (increment by 10)
+document.getElementById('posXUp').addEventListener('click', function() {
+  const posXControl = document.getElementById('positionX');
+  let value = parseInt(posXControl.value);
+  value = Math.min(value + 10, 100); // Don't exceed max
+  posXControl.value = value;
+  profileX = value;
+  document.getElementById('positionXValue').textContent = value;
+  drawProfileImage();
+  drawTextOnOverlay();
+  redrawMainCanvas();
+});
+
+document.getElementById('posXDown').addEventListener('click', function() {
+  const posXControl = document.getElementById('positionX');
+  let value = parseInt(posXControl.value);
+  value = Math.max(value - 10, -100); // Don't go below min
+  posXControl.value = value;
+  profileX = value;
+  document.getElementById('positionXValue').textContent = value;
+  drawProfileImage();
   drawTextOnOverlay();
   redrawMainCanvas();
 });
@@ -253,19 +325,39 @@ document.getElementById('positionY').addEventListener('input', function(e) {
   redrawMainCanvas();
 });
 
+// Handle vertical position buttons (increment by 10)
+document.getElementById('posYUp').addEventListener('click', function() {
+  const posYControl = document.getElementById('positionY');
+  let value = parseInt(posYControl.value);
+  value = Math.min(value + 10, 100); // Don't exceed max
+  posYControl.value = value;
+  profileY = value;
+  document.getElementById('positionYValue').textContent = value;
+  drawProfileImage();
+  drawTextOnOverlay();
+  redrawMainCanvas();
+});
+
+document.getElementById('posYDown').addEventListener('click', function() {
+  const posYControl = document.getElementById('positionY');
+  let value = parseInt(posYControl.value);
+  value = Math.max(value - 10, -100); // Don't go below min
+  posYControl.value = value;
+  profileY = value;
+  document.getElementById('positionYValue').textContent = value;
+  drawProfileImage();
+  drawTextOnOverlay();
+  redrawMainCanvas();
+});
+
 // Handle text updates
 document.getElementById('updateText').addEventListener('click', () => {
   // Get the current values from the input fields
   customText = document.getElementById('customText').value || '';
   secondText = document.getElementById('secondText').value || '';
   
-  // Clear the overlay canvas
-  overlayCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  
-  // Redraw the overlay and text
-  drawOverlay();
-  drawTextOnOverlay();
-  redrawMainCanvas();
+  // Redraw everything to ensure text appears immediately
+  draw();
 });
 
 // Wrap text function
@@ -319,8 +411,8 @@ function wrapTextDownload(ctx, text, x, y, maxWidth, lineHeight) {
 function setOverlayType(type) {
   if (OVERLAY_IMAGES[type] && currentOverlay !== type) {
     currentOverlay = type;
-    drawOverlay(type);
-    drawTextOnOverlay();
+    // Redraw everything with the new overlay type
+    draw();
   }
 }
 
@@ -344,7 +436,8 @@ function drawOverlay(overlayType = currentOverlay) {
 function drawTextOnOverlay() {
   if (!imageCache.isLoaded) return;
   
-  // Don't clear the overlay canvas here - it's already handled in drawOverlay
+  // Clear the overlay canvas first to remove any previous text
+  overlayCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   
   // Set up text styles
   const lineHeight = FONT_SIZE * 1.2;
@@ -356,19 +449,20 @@ function drawTextOnOverlay() {
     overlayCtx.font = `600 ${FONT_SIZE}px ${FONT_FAMILY}`;
     overlayCtx.fillStyle = '#f2f2f2';
     overlayCtx.textBaseline = 'top';
-    // Force the canvas to recognize the font
-    overlayCtx.font = `600 ${FONT_SIZE}px ${FONT_FAMILY}`;
-    const linesUsed = wrapText(overlayCtx, customText, TEXT_X, TEXT_Y, CANVAS_WIDTH - TEXT_X - 90, lineHeight);
+    // Force the canvas to recognize the font by measuring text first
+    overlayCtx.measureText('test');
     
-    // Draw the job title with text wrapping if it exists
+    // Draw the name with text wrapping
+    const nameLines = wrapText(overlayCtx, customText, TEXT_X, TEXT_Y, CANVAS_WIDTH - TEXT_X - 90, lineHeight);
+    
+    // Draw the job title/company if it exists
     if (secondText) {
-      const jobTitleY = TEXT_Y + (linesUsed * lineHeight) + 20;
+      const jobTitleY = TEXT_Y + (nameLines * lineHeight) + 20;
       overlayCtx.font = `300 50px ${FONT_FAMILY}`;
       // Force the canvas to recognize the font
-      overlayCtx.font = `300 50px ${FONT_FAMILY}`;
+      overlayCtx.measureText('test');
       wrapText(overlayCtx, secondText, TEXT_X, jobTitleY, CANVAS_WIDTH - TEXT_X - 90, jobLineHeight);
     }
-    
     overlayCtx.restore();
   }
   // If no name but there is a second text, still draw the second text
@@ -378,32 +472,41 @@ function drawTextOnOverlay() {
     overlayCtx.fillStyle = '#f2f2f2';
     overlayCtx.textBaseline = 'top';
     // Force the canvas to recognize the font
-    overlayCtx.font = `300 50px ${FONT_FAMILY}`;
+    overlayCtx.measureText('test');
     wrapText(overlayCtx, secondText, TEXT_X, TEXT_Y, CANVAS_WIDTH - TEXT_X - 90, jobLineHeight);
     overlayCtx.restore();
   }
-  
-  // Update the main canvas
-  redrawMainCanvas();
 }
 
-// Redraw the main canvas with all elements
-function redrawMainCanvas() {
-  // Clear the main canvas
-  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+// Function to draw the canvas with all elements
+function drawCanvas() {
+  // Clear the canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  // Draw background canvas (background image)
-  if (imageCache.background) {
-    ctx.drawImage(imageCache.background, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  // Draw background image if available
+  if (backgroundImage) {
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
   }
   
-  // Draw the profile image if it exists
+  // Draw the profile image if available
   if (profileImage) {
-    const scaledWidth = profileImage.width * profileScale;
-    const scaledHeight = profileImage.height * profileScale;
-    const x = PROFILE_X + (PROFILE_SIZE - scaledWidth) / 2 + profileX;
-    const y = PROFILE_Y + (PROFILE_SIZE - scaledHeight) / 2 + profileY;
-    ctx.drawImage(profileImage, x, y, scaledWidth, scaledHeight);
+    // Calculate position based on slider values
+    const x = canvas.width / 2 + parseInt(positionX.value);
+    const y = canvas.height / 2 + parseInt(positionY.value);
+    
+    // Calculate size based on scale
+    const scale = parseFloat(scaleControl.value);
+    const size = Math.min(canvas.width, canvas.height) / 3 * scale;
+    
+    // Draw the circular profile image
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, size / 2, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.clip();
+    
+    ctx.drawImage(profileImage, x - size / 2, y - size / 2, size, size);
+    ctx.restore();
   }
   
   // Draw the overlay canvas (with text and overlay image)
@@ -523,7 +626,7 @@ async function downloadCanvas() {
 function loadImages() {
   return new Promise((resolve) => {
     let loadedCount = 0;
-    const totalImages = 3; // background, attending, speaking
+    const totalImages = 2; // Only attending and speaking overlays
     
     const onImageLoad = () => {
       loadedCount++;
@@ -536,20 +639,8 @@ function loadImages() {
       }
     };
     
-    // Load background
-    if (!imageCache.background) {
-      const bgImg = new Image();
-      bgImg.crossOrigin = 'anonymous';
-      bgImg.onload = () => {
-        imageCache.background = bgImg;
-        onImageLoad();
-      };
-      bgImg.onerror = () => {
-        console.warn('Background image not found, using fallback color');
-        onImageLoad();
-      };
-      bgImg.src = BACKGROUND_IMAGE;
-    }
+        // We're not using a background image, just the overlay images
+    // No need to initialize imageCache.background
     
     // Load overlays
     Object.keys(OVERLAY_IMAGES).forEach(type => {

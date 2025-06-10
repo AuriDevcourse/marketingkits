@@ -13,13 +13,36 @@ body {
   background: #0F0F0F;
   border-radius: 12px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.2);
-  padding: 32px;
-  max-width: 1000px;
+  padding: 24px;
+  max-width: 1200px;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
+}
+
+.layout-container {
+  display: flex;
+  width: 100%;
+  gap: 25px;
+  align-items: flex-start;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.canvas-section {
+  flex: 0 0 500px;
+  width: 500px;
+}
+
+.controls-section {
+  flex: 1;
+  min-width: 300px;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 h1 {
@@ -31,11 +54,8 @@ h1 {
 }
 
 .canvas-container {
-  position: relative;
-  width: 100%;
-  max-width: 500px;
-  height: 500px; /* Fixed height */
-  margin: 0 auto;
+  width: 500px;
+  height: 500px;
   border: 1px solid #ddd;
   border-radius: 8px;
   overflow: hidden;
@@ -43,18 +63,18 @@ h1 {
 }
 
 canvas {
-  width: 100%;
-  height: 100%;
+  width: 500px;
+  height: 500px;
   display: block;
   background: #f5f5f5;
 }
 
 .controls {
   width: 100%;
-  max-width: 500px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
+  margin-bottom: 5px;
 }
 
 .controls label {
@@ -66,12 +86,13 @@ canvas {
 
 input[type="text"] {
   width: 100%;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 14px;
   font-family: inherit;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 input[type="text"]:focus {
@@ -110,11 +131,12 @@ input[type="text"]:focus {
 /* Image Controls */
 .image-controls {
   width: 100%;
-  max-width: 500px;
   background: #f8f9fa;
-  padding: 20px;
+  padding: 12px;
   border-radius: 8px;
-  margin: 10px 0;
+  margin: 8px 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* Toggle Buttons */
@@ -149,7 +171,8 @@ input[type="text"]:focus {
 }
 
 .control-group {
-  margin-bottom: 15px;
+  margin-bottom: 12px;
+  width: 100%;
 }
 
 .control-group:last-child {
@@ -159,18 +182,67 @@ input[type="text"]:focus {
 .control-group label {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-size: 14px;
+  white-space: nowrap;
+}
+
+/* Slider with icons */
+.slider-with-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.slider-icon {
+  color: #fff;
+  font-size: 18px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Slider with buttons */
+.slider-with-buttons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+
+.control-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.control-btn:hover {
+  background-color: #3e5871;
+}
+
+.control-btn:active {
+  background-color: #1a2530;
 }
 
 input[type="range"] {
-  width: 100%;
+  flex: 1;
   height: 6px;
   -webkit-appearance: none;
   appearance: none;
   background: #e0e0e0;
   border-radius: 3px;
   outline: none;
+  box-sizing: border-box;
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -193,14 +265,14 @@ button {
   color: #fff;
   border: none;
   border-radius: 6px;
-  padding: 12px 24px;
+  padding: 10px 20px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   width: 100%;
-  max-width: 500px;
-  margin-top: 10px;
+  margin-top: 8px;
+  box-sizing: border-box;
 }
 
 button:hover {
@@ -223,17 +295,23 @@ button:active {
 }
 
 /* Responsive adjustments */
-@media (max-width: 600px) {
+@media (max-width: 900px) {
   .container {
     padding: 20px 15px;
-    border-radius: 0;
+    max-width: 100%;
+  }
+  
+  .layout-container {
+    flex-direction: column;
+  }
+  
+  .canvas-section,
+  .controls-section {
+    width: 100%;
+    max-width: 100%;
   }
   
   .canvas-container {
-    max-width: 100%;
-  }
-  
-  .controls, .image-controls, button {
-    max-width: 100%;
+    padding-bottom: 100%;
   }
 }
