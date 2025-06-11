@@ -64,59 +64,7 @@ function draw() {
   // First draw the background to the main canvas
   ctx.drawImage(bgCanvas, 0, 0);
   
-  // Then draw the profile image as a rectangle in the bottom right
-  if (profileImage) {
-    // Calculate position based on slider values - default to bottom right
-    const baseSize = Math.min(canvas.width, canvas.height) / 3;
-    const scale = parseFloat(document.getElementById('scaleControl').value || 1.0);
-    
-    // Position adjustment from sliders
-    const xOffset = parseInt(document.getElementById('positionX').value || 0);
-    const yOffset = parseInt(document.getElementById('positionY').value || 0);
-    
-    // Fixed center point in the bottom right
-    const centerX = canvas.width - baseSize/2 - 100 + xOffset; // 100px from right edge
-    const centerY = canvas.height - baseSize/2 - 100 + yOffset; // 100px from bottom edge
-    
-    // Calculate size with scale
-    const size = baseSize * scale;
-    
-    // Calculate top-left corner to maintain the center point
-    const x = centerX - size/2;
-    const y = centerY - size/2;
-    
-    // Draw the profile image as a rectangle (no clipping)
-    ctx.drawImage(profileImage, x, y, size, size);
-  }
-  
-  // Draw the overlay image again on top of the profile image
-  if (imageCache[currentOverlay]) {
-    ctx.drawImage(imageCache[currentOverlay], 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  }
-  
-  // Draw text on the overlay canvas
-  drawTextOnOverlay();
-  
-  // Draw the overlay canvas (with text) onto the main canvas
-  ctx.drawImage(overlayCanvas, 0, 0);
-}
-
-function drawProfileImage() {
-  // Just trigger a redraw of the main canvas which will handle everything
-  redrawMainCanvas();
-  drawOverlay();
-  drawTextOnOverlay();
-}
-
-// Function to redraw the main canvas with background and profile image
-function redrawMainCanvas() {
-  // Clear the main canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  // Draw the background canvas onto the main canvas
-  ctx.drawImage(bgCanvas, 0, 0);
-  
-  // Draw the profile image as a rectangle in the bottom right
+  // Then draw the profile image in the bottom right while maintaining aspect ratio
   if (profileImage) {
     // Calculate position based on slider values - default to bottom right
     const baseSize = Math.min(canvas.width, canvas.height) / 3;
@@ -157,6 +105,23 @@ function redrawMainCanvas() {
   if (imageCache[currentOverlay]) {
     ctx.drawImage(imageCache[currentOverlay], 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
+  
+  // Draw text on the overlay canvas
+  drawTextOnOverlay();
+  
+  // Draw the overlay canvas (with text) onto the main canvas
+  ctx.drawImage(overlayCanvas, 0, 0);
+}
+
+function drawProfileImage() {
+  // Use the main draw function to ensure text is preserved
+  draw();
+}
+
+// Function to redraw the main canvas with background and profile image
+function redrawMainCanvas() {
+  // Use the main draw function to ensure consistency
+  draw();
 }
 
 // Draw overlay image
@@ -261,10 +226,8 @@ document.getElementById('imageUpload').addEventListener('change', function(e) {
 // Handle scale control
 document.getElementById('scaleControl').addEventListener('input', function(e) {
   profileScale = parseFloat(e.target.value);
-  drawProfileImage();
-  // Ensure text is redrawn
-  drawTextOnOverlay();
-  redrawMainCanvas();
+  // Use the main draw function to ensure everything is properly rendered
+  draw();
 });
 
 // Handle scale buttons (increment by 0.1)
@@ -274,9 +237,8 @@ document.getElementById('scaleUp').addEventListener('click', function() {
   value = Math.min(value + 0.1, 4.0); // Don't exceed max
   scaleControl.value = value;
   profileScale = value;
-  drawProfileImage();
-  drawTextOnOverlay();
-  redrawMainCanvas();
+  // Use the main draw function to ensure everything is properly rendered
+  draw();
 });
 
 document.getElementById('scaleDown').addEventListener('click', function() {
@@ -285,18 +247,15 @@ document.getElementById('scaleDown').addEventListener('click', function() {
   value = Math.max(value - 0.1, 0.1); // Don't go below min
   scaleControl.value = value;
   profileScale = value;
-  drawProfileImage();
-  drawTextOnOverlay();
-  redrawMainCanvas();
+  // Use the main draw function to ensure everything is properly rendered
+  draw();
 });
 
-// Handle position controls
+// Handle horizontal position control
 document.getElementById('positionX').addEventListener('input', function(e) {
   profileX = parseInt(e.target.value);
-  drawProfileImage();
-  // Ensure text is redrawn
-  drawTextOnOverlay();
-  redrawMainCanvas();
+  // Use the main draw function to ensure everything is properly rendered
+  draw();
 });
 
 // Handle horizontal position buttons (increment by 10)
@@ -306,9 +265,7 @@ document.getElementById('posXUp').addEventListener('click', function() {
   value = Math.min(value + 10, 400); // Don't exceed max
   posXControl.value = value;
   profileX = value;
-  drawProfileImage();
-  drawTextOnOverlay();
-  redrawMainCanvas();
+  draw();
 });
 
 document.getElementById('posXDown').addEventListener('click', function() {
@@ -317,17 +274,12 @@ document.getElementById('posXDown').addEventListener('click', function() {
   value = Math.max(value - 10, -400); // Don't go below min
   posXControl.value = value;
   profileX = value;
-  drawProfileImage();
-  drawTextOnOverlay();
-  redrawMainCanvas();
+  draw();
 });
 
 document.getElementById('positionY').addEventListener('input', function(e) {
   profileY = parseInt(e.target.value);
-  drawProfileImage();
-  // Ensure text is redrawn
-  drawTextOnOverlay();
-  redrawMainCanvas();
+  draw();
 });
 
 // Handle vertical position buttons (increment by 10)
@@ -337,9 +289,7 @@ document.getElementById('posYUp').addEventListener('click', function() {
   value = Math.min(value + 10, 400); // Don't exceed max
   posYControl.value = value;
   profileY = value;
-  drawProfileImage();
-  drawTextOnOverlay();
-  redrawMainCanvas();
+  draw();
 });
 
 document.getElementById('posYDown').addEventListener('click', function() {
@@ -348,18 +298,14 @@ document.getElementById('posYDown').addEventListener('click', function() {
   value = Math.max(value - 10, -400); // Don't go below min
   posYControl.value = value;
   profileY = value;
-  drawProfileImage();
-  drawTextOnOverlay();
-  redrawMainCanvas();
+  draw();
 });
 
 // Handle text updates
-document.getElementById('updateText').addEventListener('click', () => {
-  // Get the current values from the input fields
+document.getElementById('updateText').addEventListener('click', function() {
   customText = document.getElementById('customText').value || '';
   secondText = document.getElementById('secondText').value || '';
   
-  // Redraw everything to ensure text appears immediately
   draw();
 });
 

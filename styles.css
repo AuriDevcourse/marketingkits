@@ -9,6 +9,15 @@ body {
   align-items: center;
 }
 
+.slider-icon {
+  width: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
 .container {
   background: #0F0F0F;
   border-radius: 12px;
@@ -213,37 +222,54 @@ input[type="text"]:focus {
 .slider-with-icons {
   display: flex;
   align-items: center;
-  gap: 10px;
   width: 100%;
   height: 40px; /* Match the height of the buttons */
+  margin: 0 auto;
   justify-content: space-between;
+  padding: 0 20px; /* Add padding to push icons away from edges */
 }
 
 /* Make all sliders the same visual length */
 .slider-with-buttons input[type="range"] {
-  width: 200px; /* Fixed width for all sliders */
+  width: 160px; /* Reduced width to accommodate the wider margins for icons */
   margin: 0 10px;
 }
 
 .slider-icon {
   color: #fff;
-  font-size: 18px;
-  min-width: 20px;
-  width: 20px;
+  width: 30px; /* Increased width for better visibility */
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 40px; /* Match the height of the buttons */
+  flex-shrink: 0;
+  margin: 0 20px; /* Further increased margin to move icons away from adjustment bubbles */
+  position: relative; /* Enable positioning */
+  z-index: 2; /* Ensure icons appear above other elements */
+}
+
+.material-icons {
+  font-size: 24px;
+  line-height: 1;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; /* Enable positioning */
+  z-index: 2; /* Ensure icons appear above other elements */
 }
 
 /* Slider with buttons */
 .slider-with-buttons {
   display: flex;
   align-items: center;
-  gap: 10px;
-  width: 100%;
+  gap: 10px; /* Further increased gap between elements */
+  width: 200px; /* Further reduced width to ensure better spacing */
   height: 40px; /* Match the height of the buttons */
+  justify-content: center;
+  position: relative; /* Enable positioning */
+  z-index: 1; /* Lower z-index than icons */
 }
 
 .control-btn {
@@ -336,13 +362,35 @@ button:active {
   padding: 12px 20px;
 }
 
+.download-btn .material-icons {
+  font-size: 20px;
+  margin-left: 5px;
+}
+
 .download-btn:hover {
   background: #FF0028;
   box-shadow: 0 4px 12px rgba(255,0,40,0.3);
 }
 
-.material-symbols-outlined {
-  font-size: 24px;
+/* Material Icons styling already defined above */
+
+/* Step container and label styling */
+.step-container {
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.step-container:last-child {
+  margin-bottom: 0;
+}
+
+.step-label {
+  font-family: 'Archivo Expanded', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: #FF0028;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
 }
 
 /* Responsive adjustments */
