@@ -130,15 +130,27 @@ function redrawMainCanvas() {
     const centerX = canvas.width - baseSize/2 - 100 + xOffset; // 100px from right edge
     const centerY = canvas.height - baseSize/2 - 100 + yOffset; // 100px from bottom edge
     
-    // Calculate size with scale
-    const size = baseSize * scale;
+    // Calculate size with scale while maintaining aspect ratio
+    const maxSize = baseSize * scale;
+    
+    // Calculate dimensions that maintain aspect ratio
+    let width, height;
+    if (profileImage.width > profileImage.height) {
+      // Landscape image
+      width = maxSize;
+      height = (profileImage.height / profileImage.width) * maxSize;
+    } else {
+      // Portrait or square image
+      height = maxSize;
+      width = (profileImage.width / profileImage.height) * maxSize;
+    }
     
     // Calculate top-left corner to maintain the center point
-    const x = centerX - size/2;
-    const y = centerY - size/2;
+    const x = centerX - width/2;
+    const y = centerY - height/2;
     
-    // Draw the profile image as a rectangle (no clipping)
-    ctx.drawImage(profileImage, x, y, size, size);
+    // Draw the profile image with proper aspect ratio
+    ctx.drawImage(profileImage, x, y, width, height);
   }
   
   // Draw the overlay image again on top of the profile image
@@ -249,7 +261,6 @@ document.getElementById('imageUpload').addEventListener('change', function(e) {
 // Handle scale control
 document.getElementById('scaleControl').addEventListener('input', function(e) {
   profileScale = parseFloat(e.target.value);
-  document.getElementById('scaleValue').textContent = `${Math.round(profileScale * 100)}%`;
   drawProfileImage();
   // Ensure text is redrawn
   drawTextOnOverlay();
@@ -263,7 +274,6 @@ document.getElementById('scaleUp').addEventListener('click', function() {
   value = Math.min(value + 0.1, 4.0); // Don't exceed max
   scaleControl.value = value;
   profileScale = value;
-  document.getElementById('scaleValue').textContent = `${Math.round(value * 100)}%`;
   drawProfileImage();
   drawTextOnOverlay();
   redrawMainCanvas();
@@ -275,7 +285,6 @@ document.getElementById('scaleDown').addEventListener('click', function() {
   value = Math.max(value - 0.1, 0.1); // Don't go below min
   scaleControl.value = value;
   profileScale = value;
-  document.getElementById('scaleValue').textContent = `${Math.round(value * 100)}%`;
   drawProfileImage();
   drawTextOnOverlay();
   redrawMainCanvas();
@@ -284,7 +293,6 @@ document.getElementById('scaleDown').addEventListener('click', function() {
 // Handle position controls
 document.getElementById('positionX').addEventListener('input', function(e) {
   profileX = parseInt(e.target.value);
-  document.getElementById('positionXValue').textContent = profileX;
   drawProfileImage();
   // Ensure text is redrawn
   drawTextOnOverlay();
@@ -295,10 +303,9 @@ document.getElementById('positionX').addEventListener('input', function(e) {
 document.getElementById('posXUp').addEventListener('click', function() {
   const posXControl = document.getElementById('positionX');
   let value = parseInt(posXControl.value);
-  value = Math.min(value + 10, 100); // Don't exceed max
+  value = Math.min(value + 10, 400); // Don't exceed max
   posXControl.value = value;
   profileX = value;
-  document.getElementById('positionXValue').textContent = value;
   drawProfileImage();
   drawTextOnOverlay();
   redrawMainCanvas();
@@ -307,10 +314,9 @@ document.getElementById('posXUp').addEventListener('click', function() {
 document.getElementById('posXDown').addEventListener('click', function() {
   const posXControl = document.getElementById('positionX');
   let value = parseInt(posXControl.value);
-  value = Math.max(value - 10, -100); // Don't go below min
+  value = Math.max(value - 10, -400); // Don't go below min
   posXControl.value = value;
   profileX = value;
-  document.getElementById('positionXValue').textContent = value;
   drawProfileImage();
   drawTextOnOverlay();
   redrawMainCanvas();
@@ -318,7 +324,6 @@ document.getElementById('posXDown').addEventListener('click', function() {
 
 document.getElementById('positionY').addEventListener('input', function(e) {
   profileY = parseInt(e.target.value);
-  document.getElementById('positionYValue').textContent = profileY;
   drawProfileImage();
   // Ensure text is redrawn
   drawTextOnOverlay();
@@ -329,10 +334,9 @@ document.getElementById('positionY').addEventListener('input', function(e) {
 document.getElementById('posYUp').addEventListener('click', function() {
   const posYControl = document.getElementById('positionY');
   let value = parseInt(posYControl.value);
-  value = Math.min(value + 10, 100); // Don't exceed max
+  value = Math.min(value + 10, 400); // Don't exceed max
   posYControl.value = value;
   profileY = value;
-  document.getElementById('positionYValue').textContent = value;
   drawProfileImage();
   drawTextOnOverlay();
   redrawMainCanvas();
@@ -341,10 +345,9 @@ document.getElementById('posYUp').addEventListener('click', function() {
 document.getElementById('posYDown').addEventListener('click', function() {
   const posYControl = document.getElementById('positionY');
   let value = parseInt(posYControl.value);
-  value = Math.max(value - 10, -100); // Don't go below min
+  value = Math.max(value - 10, -400); // Don't go below min
   posYControl.value = value;
   profileY = value;
-  document.getElementById('positionYValue').textContent = value;
   drawProfileImage();
   drawTextOnOverlay();
   redrawMainCanvas();
@@ -667,11 +670,6 @@ function initApp() {
   // Set canvas size
   canvas.width = CANVAS_WIDTH;
   canvas.height = CANVAS_HEIGHT;
-  
-  // Set up UI controls
-  document.getElementById('scaleValue').textContent = '100%';
-  document.getElementById('positionXValue').textContent = '0';
-  document.getElementById('positionYValue').textContent = '0';
   
   // Set up scale control (10% to 400%)
   document.getElementById('scaleControl').min = 0.1;

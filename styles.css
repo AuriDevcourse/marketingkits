@@ -80,19 +80,34 @@ canvas {
 .controls label {
   display: block;
   margin-bottom: 4px;
-  font-weight: 500;
+  font-weight: 700; /* Changed to bold */
   color: #fff;
+  font-size: 16px;
+}
+
+/* Override for the upload button label */
+.controls label.upload-btn {
+  color: #000 !important;
 }
 
 input[type="text"] {
   width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  font-family: inherit;
+  padding: 15px 20px;
+  border: 1px solid #fff;
+  border-radius: 12px;
+  font-size: 16px;
+  font-family: 'Archivo Expanded', Arial, sans-serif;
   transition: border-color 0.2s;
   box-sizing: border-box;
+  background: transparent;
+  color: #fff;
+}
+
+/* Placeholder text styling */
+input[type="text"]::placeholder {
+  font-size: 14px;
+  opacity: 0.7;
+  font-family: 'Archivo Expanded', Arial, sans-serif;
 }
 
 input[type="text"]:focus {
@@ -109,9 +124,16 @@ input[type="text"]:focus {
   cursor: pointer;
   background: #f0f0f0;
   padding: 10px 16px;
-  border-radius: 6px;
+  border-radius: 12px;
   text-align: center;
   transition: background 0.2s;
+  color: #000 !important; /* Changed to black with !important to override */
+  font-weight: 500;
+}
+
+/* Specifically target the span inside upload button */
+.upload-btn span {
+  color: #000 !important; /* Using !important to override any inherited styles */
 }
 
 .upload-btn:hover {
@@ -131,9 +153,7 @@ input[type="text"]:focus {
 /* Image Controls */
 .image-controls {
   width: 100%;
-  background: #f8f9fa;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 12px 0;
   margin: 8px 0;
   box-sizing: border-box;
   overflow: hidden;
@@ -151,9 +171,9 @@ input[type="text"]:focus {
   padding: 10px 15px;
   background-color: #f0f0f0;
   border: 2px solid #ddd;
-  border-radius: 5px;
+  border-radius: 12px;
   cursor: pointer;
-  font-family: 'Archivo Expanded', sans-serif;
+  font-family: 'Archivo Expanded', Arial, sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: #555;
@@ -183,8 +203,10 @@ input[type="text"]:focus {
   display: flex;
   justify-content: space-between;
   margin-bottom: 6px;
-  font-size: 14px;
+  font-size: 16px;
   white-space: nowrap;
+  color: #fff;
+  font-weight: 700; /* Changed to bold */
 }
 
 /* Slider with icons */
@@ -193,37 +215,52 @@ input[type="text"]:focus {
   align-items: center;
   gap: 10px;
   width: 100%;
+  height: 40px; /* Match the height of the buttons */
+  justify-content: space-between;
+}
+
+/* Make all sliders the same visual length */
+.slider-with-buttons input[type="range"] {
+  width: 200px; /* Fixed width for all sliders */
+  margin: 0 10px;
 }
 
 .slider-icon {
   color: #fff;
   font-size: 18px;
   min-width: 20px;
+  width: 20px;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px; /* Match the height of the buttons */
 }
 
 /* Slider with buttons */
 .slider-with-buttons {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 10px;
   width: 100%;
+  height: 40px; /* Match the height of the buttons */
 }
 
 .control-btn {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background-color: #2c3e50;
   color: white;
   border: none;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background-color 0.2s;
+  flex-shrink: 0; /* Prevent button from shrinking */
 }
 
 .control-btn:hover {
@@ -235,24 +272,25 @@ input[type="text"]:focus {
 }
 
 input[type="range"] {
-  flex: 1;
-  height: 6px;
+  flex: 0 0 auto; /* Don't grow or shrink */
+  height: 2px; /* Thinner line */
   -webkit-appearance: none;
   appearance: none;
-  background: #e0e0e0;
-  border-radius: 3px;
+  background: #FF0028; /* Red line */
+  border-radius: 1px;
   outline: none;
   box-sizing: border-box;
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  background: #FF0028;
+  width: 20px;
+  height: 20px;
+  background: #FF0028; /* Red bubble */
   border-radius: 50%;
   cursor: pointer;
   transition: transform 0.1s;
+  box-shadow: 0 0 2px rgba(0,0,0,0.3);
 }
 
 input[type="range"]:active::-webkit-slider-thumb {
@@ -264,10 +302,11 @@ button {
   background: #FF0028;
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 12px;
   padding: 10px 20px;
   font-size: 16px;
   font-weight: 600;
+  font-family: 'Archivo Expanded', Arial, sans-serif;
   cursor: pointer;
   transition: all 0.2s;
   width: 100%;
@@ -286,12 +325,24 @@ button:active {
 }
 
 .download-btn {
-  background: #2c3e50;
+  background: #FF0028;
   margin-top: 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 18px;
+  padding: 12px 20px;
 }
 
 .download-btn:hover {
-  background: #1a252f;
+  background: #FF0028;
+  box-shadow: 0 4px 12px rgba(255,0,40,0.3);
+}
+
+.material-symbols-outlined {
+  font-size: 24px;
 }
 
 /* Responsive adjustments */
