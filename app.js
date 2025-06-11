@@ -167,9 +167,8 @@ function resizeImageToFit(img, maxWidth, maxHeight) {
   return resizedImage;
 }
 
-// Handle image upload
-document.getElementById('imageUpload').addEventListener('change', function(e) {
-  const file = e.target.files[0];
+// Function to handle the selected file (either from input or drop)
+function handleFile(file) {
   if (!file) return;
   
   // Check file type
@@ -184,44 +183,96 @@ document.getElementById('imageUpload').addEventListener('change', function(e) {
     return;
   }
   
+  // Update the button text to show selected filename
+  const fileButton = document.querySelector('.choose-file-button');
+  if (fileButton) {
+    fileButton.textContent = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
+  }
+  
   const reader = new FileReader();
+  
   reader.onload = function(event) {
     const img = new Image();
     img.onload = function() {
-      // Resize the image to fit within the profile area if it's too large
       const maxSize = Math.max(CANVAS_WIDTH, CANVAS_HEIGHT) * 2; // Allow 2x for high DPI
       const resizedImg = resizeImageToFit(img, maxSize, maxSize);
       
-      resizedImg.onload = function() {
-        profileImage = resizedImg;
-        // Reset scale and position
-        profileScale = 1.0;
-        profileX = 0;
-        profileY = 0;
-        
-        // Auto-scale to fit the profile area if the image is smaller
-        const profileAreaSize = PROFILE_SIZE * 0.8; // 80% of the profile area
-        const scaleToFit = Math.min(
-          profileAreaSize / resizedImg.width,
-          profileAreaSize / resizedImg.height
-        );
-        
-        if (scaleToFit > 1) {
-          document.getElementById('scaleControl').value = scaleToFit.toFixed(2);
-          profileScale = scaleToFit;
-          document.getElementById('scaleValue').textContent = `${Math.round(scaleToFit * 100)}%`;
-        }
-        
-        draw();
-      };
+      profileImage = resizedImg;
+      // Reset scale and position
+      profileScale = 1.0;
+      profileX = 0;
+      profileY = 0;
+      
+      // Auto-scale to fit the profile area if the image is smaller
+      const profileAreaSize = PROFILE_SIZE * 0.8; // 80% of the profile area
+      const scaleToFit = Math.min(
+        profileAreaSize / resizedImg.width,
+        profileAreaSize / resizedImg.height
+      );
+      
+      if (scaleToFit > 1) {
+        document.getElementById('scaleControl').value = scaleToFit.toFixed(2);
+        profileScale = scaleToFit;
+        document.getElementById('scaleValue').textContent = `${Math.round(scaleToFit * 100)}%`;
+      }
+      
+      draw();
     };
     img.src = event.target.result;
   };
+  
   reader.onerror = function() {
     alert('Error reading the image file');
   };
+  
   reader.readAsDataURL(file);
+}
+
+// Handle image upload via input change
+document.getElementById('imageUpload').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  handleFile(file);
 });
+
+// Handle drag and drop functionality
+const dropContainer = document.querySelector('.drop-container');
+
+// Prevent default drag behaviors
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+  dropContainer.addEventListener(eventName, preventDefaults, false);
+  document.body.addEventListener(eventName, preventDefaults, false);
+});
+
+// Highlight drop area when item is dragged over it
+['dragenter', 'dragover'].forEach(eventName => {
+  dropContainer.addEventListener(eventName, highlight, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+  dropContainer.addEventListener(eventName, unhighlight, false);
+});
+
+// Handle drop
+dropContainer.addEventListener('drop', handleDrop, false);
+
+function preventDefaults(e) {
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+function highlight() {
+  dropContainer.classList.add('highlight');
+}
+
+function unhighlight() {
+  dropContainer.classList.remove('highlight');
+}
+
+function handleDrop(e) {
+  const dt = e.dataTransfer;
+  const file = dt.files[0];
+  handleFile(file);
+}
 
 // Handle scale control
 document.getElementById('scaleControl').addEventListener('input', function(e) {

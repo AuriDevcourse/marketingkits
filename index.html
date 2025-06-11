@@ -41,23 +41,33 @@
           </div>
         </div>
         
-        <!-- Image Upload -->
+        <!-- Step 2 with Overlay Type first -->
         <div class="step-container">
           <div class="step-label">STEP 2</div>
-          <div class="controls">
-            <label for="imageUpload" class="upload-btn">
-              <span>UPLOAD PROFILE IMAGE</span>
-              <input type="file" id="imageUpload" accept="image/*" />
-            </label>
-          </div>
           
           <!-- Overlay Type -->
-          <div class="controls">
+          <div class="controls overlay-type">
             <label>OVERLAY TYPE:</label>
             <div class="toggle-buttons">
               <button class="toggle-btn active" data-type="attending">Attending</button>
               <button class="toggle-btn" data-type="speaking">Speaking</button>
             </div>
+          </div>
+          
+          <!-- Image Upload with new styling -->
+          <div class="controls">
+            <form class="form">
+              <span class="form-title">Upload your picture</span>
+              <p class="form-paragraph">
+                File should be an image
+              </p>
+              <label for="imageUpload" class="drop-container">
+                <span class="drop-title">Drop files here</span>
+                or
+                <input type="file" accept="image/*" id="imageUpload">
+                <div class="choose-file-button">Choose file</div>
+              </label>
+            </form>
           </div>
         </div>
       </div>
