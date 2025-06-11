@@ -7,6 +7,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .slider-icon {
@@ -29,6 +30,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  box-sizing: border-box;
 }
 
 .layout-container {
@@ -38,6 +40,7 @@ body {
   align-items: flex-start;
   justify-content: center;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .canvas-section {
@@ -52,6 +55,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  align-items: center; /* Center children horizontally */
 }
 
 h1 {
@@ -202,6 +206,9 @@ input[type="text"]:focus {
 .control-group {
   margin-bottom: 12px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
 }
 
 .control-group:last-child {
@@ -225,14 +232,14 @@ input[type="text"]:focus {
   width: 100%;
   height: 40px; /* Match the height of the buttons */
   margin: 0 auto;
-  justify-content: space-between;
-  padding: 0 20px; /* Add padding to push icons away from edges */
+  justify-content: center; /* Center the contents horizontally */
+  padding: 0; /* Remove padding to allow for better centering */
 }
 
 /* Make all sliders the same visual length */
 .slider-with-buttons input[type="range"] {
-  width: 160px; /* Reduced width to accommodate the wider margins for icons */
-  margin: 0 10px;
+  width: 180px; /* Increased width for better balance */
+  margin: 0 15px; /* Increased margin for better spacing */
 }
 
 .slider-icon {
@@ -244,7 +251,7 @@ input[type="text"]:focus {
   justify-content: center;
   height: 40px; /* Match the height of the buttons */
   flex-shrink: 0;
-  margin: 0 20px; /* Further increased margin to move icons away from adjustment bubbles */
+  margin: 0 10px; /* Adjusted margin for better centering */
   position: relative; /* Enable positioning */
   z-index: 2; /* Ensure icons appear above other elements */
 }
@@ -264,17 +271,19 @@ input[type="text"]:focus {
 .slider-with-buttons {
   display: flex;
   align-items: center;
-  gap: 10px; /* Further increased gap between elements */
-  width: 200px; /* Further reduced width to ensure better spacing */
-  height: 40px; /* Match the height of the buttons */
+  gap: 10px;
+  width: 100%; /* Use full width of container */
+  max-width: 320px; /* Set maximum width for better control */
+  height: 40px;
   justify-content: center;
-  position: relative; /* Enable positioning */
-  z-index: 1; /* Lower z-index than icons */
+  position: relative;
+  z-index: 1;
+  margin: 0 auto; /* Center the entire control */
 }
 
 .control-btn {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background-color: #2c3e50;
   color: white;
@@ -287,6 +296,11 @@ input[type="text"]:focus {
   cursor: pointer;
   transition: background-color 0.2s;
   flex-shrink: 0; /* Prevent button from shrinking */
+  min-width: 50px; /* Ensure minimum width */
+  min-height: 50px; /* Ensure minimum height */
+  padding: 0; /* Remove any padding that might affect shape */
+  box-sizing: border-box; /* Include padding in width/height calculation */
+  aspect-ratio: 1/1; /* Force 1:1 aspect ratio */
 }
 
 .control-btn:hover {
@@ -395,22 +409,117 @@ button:active {
 
 /* Responsive adjustments */
 @media (max-width: 900px) {
+  body {
+    padding: 10px;
+  }
+
   .container {
     padding: 20px 15px;
     max-width: 100%;
+    margin: 0;
+    border-radius: 8px;
   }
   
   .layout-container {
     flex-direction: column;
+    gap: 15px;
   }
   
   .canvas-section,
   .controls-section {
     width: 100%;
     max-width: 100%;
+    flex: 1 1 auto;
+  }
+  
+  .canvas-section {
+    flex: 0 0 auto;
   }
   
   .canvas-container {
+    width: 100%;
+    height: auto;
+    position: relative;
     padding-bottom: 100%;
+    overflow: hidden;
+    border-radius: 6px;
+  }
+  
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  /* Improve slider controls on mobile */
+  .slider-container {
+    width: 100%;
+    margin: 5px 0;
+  }
+  
+  .slider {
+    width: 100%;
+  }
+
+  /* Improve control spacing */
+  .controls {
+    margin-bottom: 12px;
+  }
+
+  /* Make buttons more touch-friendly */
+  button {
+    padding: 10px 15px;
+    min-height: 44px;
+  }
+
+  .slider-icon {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* Additional styles for very small screens */
+@media (max-width: 480px) {
+  body {
+    padding: 5px;
+  }
+
+  .container {
+    padding: 15px 10px;
+  }
+
+  .step-label {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  label {
+    font-size: 14px;
+  }
+
+  input[type="text"] {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  button {
+    font-size: 14px;
+  }
+
+  .slider-container {
+    margin: 3px 0;
+  }
+  
+  /* Hide arrow icons on mobile */
+  .slider-icon {
+    display: none;
+  }
+  
+  /* Adjust spacing when arrows are hidden */
+  .slider-with-buttons {
+    max-width: 250px;
   }
 }
