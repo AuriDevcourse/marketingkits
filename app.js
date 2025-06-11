@@ -111,11 +111,57 @@ function draw() {
   
   // Draw the overlay canvas (with text) onto the main canvas
   ctx.drawImage(overlayCanvas, 0, 0);
+  
+  // Update the file size display after drawing
+  updateFileSizeDisplay();
 }
 
 function drawProfileImage() {
-  // Use the main draw function to ensure text is preserved
-  draw();
+  // Make sure we force a redraw even if imageCache isn't loaded yet
+  // This ensures the profile image appears immediately after upload
+  if (!imageCache.isLoaded) {
+    // Draw just the profile image without the overlay
+    if (profileImage) {
+      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      
+      // Calculate position based on slider values - default to bottom right
+      const baseSize = Math.min(canvas.width, canvas.height) / 3;
+      const scale = parseFloat(document.getElementById('scaleControl').value || 1.0);
+      
+      // Position adjustment from sliders
+      const xOffset = parseInt(document.getElementById('positionX').value || 0);
+      const yOffset = parseInt(document.getElementById('positionY').value || 0);
+      
+      // Fixed center point in the bottom right
+      const centerX = canvas.width - baseSize/2 - 100 + xOffset; // 100px from right edge
+      const centerY = canvas.height - baseSize/2 - 100 + yOffset; // 100px from bottom edge
+      
+      // Calculate size with scale while maintaining aspect ratio
+      const maxSize = baseSize * scale;
+      
+      // Calculate dimensions that maintain aspect ratio
+      let width, height;
+      if (profileImage.width > profileImage.height) {
+        // Landscape image
+        width = maxSize;
+        height = (profileImage.height / profileImage.width) * maxSize;
+      } else {
+        // Portrait or square image
+        height = maxSize;
+        width = (profileImage.width / profileImage.height) * maxSize;
+      }
+      
+      // Calculate top-left corner to maintain the center point
+      const x = centerX - width/2;
+      const y = centerY - height/2;
+      
+      // Draw the profile image with proper aspect ratio
+      ctx.drawImage(profileImage, x, y, width, height);
+    }
+  } else {
+    // Use the main draw function to ensure text is preserved
+    draw();
+  }
 }
 
 // Function to redraw the main canvas with background and profile image
@@ -216,7 +262,10 @@ function handleFile(file) {
         document.getElementById('scaleValue').textContent = `${Math.round(scaleToFit * 100)}%`;
       }
       
-      draw();
+      // Use drawProfileImage instead of draw to ensure it renders even if imageCache isn't loaded
+      drawProfileImage();
+      // Update file size display
+      updateFileSizeDisplay();
     };
     img.src = event.target.result;
   };
@@ -552,6 +601,40 @@ function ensureFontsLoaded() {
   });
 }
 
+// Function to calculate and update file size display
+function updateFileSizeDisplay() {
+  // Create a temporary canvas to estimate file size
+  const sizeCanvas = document.createElement('canvas');
+  sizeCanvas.width = CANVAS_WIDTH;
+  sizeCanvas.height = CANVAS_HEIGHT;
+  const sizeCtx = sizeCanvas.getContext('2d');
+  
+  // Draw current canvas state
+  sizeCtx.drawImage(canvas, 0, 0);
+  
+  // Get data URL and estimate size
+  const dataURL = sizeCanvas.toDataURL('image/jpeg', 1.0);
+  // Base64 string length * 0.75 gives approximate byte size
+  const base64String = dataURL.split(',')[1];
+  const approximateBytes = base64String.length * 0.75;
+  
+  // Convert to appropriate unit
+  let fileSizeText;
+  if (approximateBytes > 1048576) { // 1MB
+    fileSizeText = (approximateBytes / 1048576).toFixed(1) + 'MB';
+  } else if (approximateBytes > 1024) { // 1KB
+    fileSizeText = Math.round(approximateBytes / 1024) + 'KB';
+  } else {
+    fileSizeText = Math.round(approximateBytes) + 'B';
+  }
+  
+  // Update the file size tooltip
+  const fileSizeTooltip = document.querySelector('.file-size-tooltip');
+  if (fileSizeTooltip) {
+    fileSizeTooltip.textContent = fileSizeText;
+  }
+}
+
 // Handle download
 async function downloadCanvas() {
   // Wait for fonts to be fully loaded
@@ -695,6 +778,8 @@ function initApp() {
   loadImages().then(() => {
     // Initial draw after all images are loaded
     draw();
+    // Initialize file size display
+    updateFileSizeDisplay();
   });
 }
 
