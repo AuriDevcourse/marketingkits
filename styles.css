@@ -88,8 +88,9 @@ body {
 }
 
 .canvas-section {
-  flex: 0 0 550px;
-  width: 550px;
+  flex: 0 0 auto;
+  width: auto;
+  max-height: none;
 }
 
 .controls-section {
@@ -124,7 +125,7 @@ canvas {
   width: 550px;
   height: 550px;
   display: block;
-  background: #f5f5f5;
+  background: #0F0F0F;
 }
 
 .controls {
@@ -514,86 +515,143 @@ button:active {
 /* Responsive adjustments */
 @media (max-width: 900px) {
   body {
-    padding: 10px 5px;
+    margin: 0;
+    padding: 0;
   }
 
   .container {
-    padding: 20px 15px;
-    max-width: calc(100% - 10px);
-    margin: 0 5px;
-    border-radius: 8px;
+    padding: 0;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+    background-color: #0F0F0F;
   }
   
-  .layout-container {
-    flex-direction: column;
-    gap: 15px;
+  /* Fixed header for mobile */
+  .mobile-sticky-header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background-color: #0F0F0F;
+    padding: 0;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-height: none;
   }
   
-  .canvas-section,
-  .controls-section,
-  .mobile-controls-section {
+  /* Make the canvas container smaller for mobile */
+  .canvas-container {
     width: 100%;
     max-width: 100%;
-    flex: 1 1 auto;
-    padding: 0 5px;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    aspect-ratio: auto;
+    overflow: visible;
+    background-color: transparent;
   }
   
-  .canvas-section {
-    flex: 0 0 auto;
+  /* Add padding to push content below fixed header */
+  .controls-section {
+    padding: 15px;
+    margin-top: 10px; /* Small margin for spacing */
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 998; /* Lower than the sticky header */
   }
   
-  /* For very small screens, adjust the layout */
-  @media (max-width: 599px) {
-    .mobile-controls-row {
-      flex-direction: column;
-      gap: 15px;
-    }
-    
-    .step-3-container,
-    .step-4-container {
-      max-width: 100%;
-      width: 100%;
-    }
-    
-    /* Make slider controls fit better on small screens */
-    .slider-with-buttons {
-      max-width: 100%;
-      gap: 5px;
-    }
-    
-    .control-btn {
-      width: 40px;
-      height: 40px;
-      min-width: 40px;
-      min-height: 40px;
-    }
-    
-    .slider-with-buttons input[type="range"] {
-      width: calc(100% - 100px);
-      margin: 0 5px;
-    }
-    
-    .step-4-container {
-      margin-top: 0;
-    }
+  /* Hide the main heading on mobile to save space */
+  .container > h1 {
+    display: none;
+  }
+  
+  /* Stack all controls vertically */
+  .layout-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Ensure steps stack vertically */
+  .mobile-controls-row {
+    flex-direction: column;
+  }
+  
+  .step-3-container,
+  .step-4-container {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  
+  /* Make steps container more compact */
+  .step-container {
+    margin-bottom: 15px;
+    padding: 12px;
+    display: block !important;
+  }
+  
+  /* Ensure the mobile controls row stacks on mobile */
+  .mobile-controls-row {
+    flex-direction: column;
+  }
+  
+  .step-3-container,
+  .step-4-container {
+    width: 100%;
+  }
+
+  
+  /* Make slider controls fit better on small screens */
+  .slider-with-buttons {
+    max-width: 100%;
+    gap: 5px;
+  }
+  
+  .control-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+  
+  .slider-with-buttons input[type="range"] {
+    width: calc(100% - 100px);
+    margin: 0 5px;
+  }
+  
+  .step-4-container {
+    margin-top: 0;
   }
   
   .canvas-container {
     width: 100%;
+    max-width: 100%;
     height: auto;
     position: relative;
-    padding-bottom: 100%;
-    overflow: hidden;
-    border-radius: 6px;
+    padding: 0;
+    max-height: none;
+    overflow: visible;
+    border-radius: 0;
+    background-color: transparent;
+    margin: 0;
   }
   
   canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: relative;
     width: 100%;
-    height: 100%;
+    height: auto;
     object-fit: contain;
+    background-color: transparent;
   }
   
   /* Improve slider controls on mobile */
@@ -625,6 +683,13 @@ button:active {
 
 /* Additional styles for very small screens */
 @media (max-width: 480px) {
+  .mobile-sticky-header {
+    padding: 3px 0;
+  }
+  
+  .canvas-container {
+    max-width: 260px;
+  }
   body {
     padding: 5px;
   }
