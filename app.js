@@ -549,7 +549,8 @@ async function downloadCanvas() {
     
     // Create download link
     const link = document.createElement('a');
-    link.download = 'techbbq-profile.jpg';
+    // Set filename based on the selected overlay
+    link.download = `techbbq-${currentOverlay}.jpg`;
     link.href = tempCanvas.toDataURL('image/jpeg', 1.0);
     document.body.appendChild(link);
     link.click();
@@ -560,7 +561,8 @@ async function downloadCanvas() {
     console.error('Error loading overlay for download:', e);
     // If overlay fails, still try to download what we have
     const link = document.createElement('a');
-    link.download = 'techbbq-profile.jpg';
+    // Set filename based on the selected overlay even in error case
+    link.download = `techbbq-${currentOverlay}.jpg`;
     link.href = tempCanvas.toDataURL('image/jpeg', 1.0);
     document.body.appendChild(link);
     link.click();
